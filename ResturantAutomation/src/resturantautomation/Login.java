@@ -127,7 +127,29 @@ public class Login extends javax.swing.JFrame {
         if (flag==0)
         {
             JOptionPane.showMessageDialog(null,"Welcome user");
-        }
+            if ("manager".equals(rs.getString(2)))
+            {
+                new Manager().setVisible(true);
+                this.setVisible(false);
+            }
+            else if("chef".equals(rs.getString(2)))
+            {
+                new Chef().setVisible(true);
+                this.setVisible(false);
+            }
+            else if ("waiter".equals(rs.getString(2)))
+            {
+                new Waiter().setVisible(true);
+                this.setVisible(false);
+            }
+            else if ("customer".equals(rs.getString(2)))
+            {
+                new Customer().setVisible(true);
+                this.setVisible(false);
+            }
+
+         }
+        
         
         else
         {
