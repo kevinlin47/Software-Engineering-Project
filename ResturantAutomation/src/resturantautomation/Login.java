@@ -126,7 +126,6 @@ public class Login extends javax.swing.JFrame {
         
         if (flag==0)
         {
-            JOptionPane.showMessageDialog(null,"Welcome user");
             if ("manager".equals(rs.getString(2)))
             {
                 new Manager().setVisible(true);
