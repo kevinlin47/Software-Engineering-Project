@@ -29,7 +29,7 @@
                   <Component id="viewTable" min="-2" pref="90" max="-2" attributes="0"/>
                   <Component id="newOrder" min="-2" pref="90" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="208" max="32767" attributes="0"/>
+              <EmptySpace pref="209" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

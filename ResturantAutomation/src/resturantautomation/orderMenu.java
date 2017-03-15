@@ -286,7 +286,7 @@ public class orderMenu extends javax.swing.JFrame {
                for (int i=0;i<indexes.length;++i)
                {    
                    ListModel model = appetizersList.getModel();
-                   Object o=model.getElementAt(i);
+                   Object o=model.getElementAt(indexes[i]);
                    dlm.addElement(o);
                }
                
@@ -297,7 +297,7 @@ public class orderMenu extends javax.swing.JFrame {
                for (int i=0;i<indexes.length;++i)
                {    
                    ListModel model = drinksList.getModel();
-                   Object o=model.getElementAt(i);
+                   Object o=model.getElementAt(indexes[i]);
                    dlm.addElement(o);
                }
                
@@ -308,7 +308,7 @@ public class orderMenu extends javax.swing.JFrame {
                for (int i=0;i<indexes.length;++i)
                {
                    ListModel model=entreesList.getModel();
-                   Object o=model.getElementAt(i);
+                   Object o=model.getElementAt(indexes[i]);
                    dlm.addElement(o);
                }
            }
@@ -318,7 +318,7 @@ public class orderMenu extends javax.swing.JFrame {
                for (int i=0;i<indexes.length;++i)
                {
                    ListModel model=dessertsList.getModel();
-                   Object o=model.getElementAt(i);
+                   Object o=model.getElementAt(indexes[i]);
                    dlm.addElement(o);
                }
            }
