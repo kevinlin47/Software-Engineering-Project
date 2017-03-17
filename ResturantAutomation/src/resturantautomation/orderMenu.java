@@ -8,10 +8,15 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -115,6 +120,11 @@ public class orderMenu extends javax.swing.JFrame {
 
         submitOrder.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         submitOrder.setText("SUBMIT");
+        submitOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                submitOrderActionPerformed(evt);
+            }
+        });
 
         deleteButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         deleteButton.setText("REMOVE");
@@ -345,6 +355,73 @@ public class orderMenu extends javax.swing.JFrame {
             orderList.setModel(dlm);
         }
     }//GEN-LAST:event_clearButtonActionPerformed
+
+    private void submitOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitOrderActionPerformed
+       try{
+            int orderSize=dlm.getSize();
+            
+            if (orderSize==0)
+            {
+                JOptionPane.showMessageDialog(null,"Order is Empty");
+                return;
+            }
+            
+            ArrayList<String> orders=new ArrayList<String>();
+            
+            for (int i=0;i<orderSize;++i)
+            {
+                ListModel model=orderList.getModel();
+                String entry=(String)model.getElementAt(i);
+                orders.add(entry);
+            }
+            
+            /*for (int i=0;i<orders.size();++i)
+            {
+            System.out.println(orders.get(i));
+            }*/
+            String completeOrder="";
+            for (int i=0;i<orders.size();++i)
+            {
+                if (i!=orders.size()-1)
+                {
+                    completeOrder=completeOrder+orders.get(i)+",";
+                }
+                else
+                {
+                    completeOrder=completeOrder+orders.get(i)+";";
+                }
+                
+                if ((i+1)%3==0)
+                {
+                    completeOrder=completeOrder+"\n";
+                }
+                
+            }
+            /*System.out.print(completeOrder);*/
+            Socket sock=new Socket("10.0.0.2",444);
+            PrintStream PS=new PrintStream(sock.getOutputStream());
+            PS.println(completeOrder);
+            
+            InputStreamReader IR = new InputStreamReader(sock.getInputStream());
+            BufferedReader BR=new BufferedReader(IR);
+            
+            String message=BR.readLine();
+            
+            if (message!=null)
+            {
+                JOptionPane.showMessageDialog(null,"Order Submitted");
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null,"Order Failed");
+            }
+            
+            dlm.removeAllElements();
+            orderList.setModel(dlm);
+        } catch (IOException ex) {
+            Logger.getLogger(orderMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_submitOrderActionPerformed
     
 
 
