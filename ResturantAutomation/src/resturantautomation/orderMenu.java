@@ -391,14 +391,11 @@ public class orderMenu extends javax.swing.JFrame {
                     completeOrder=completeOrder+orders.get(i)+";";
                 }
                 
-                if ((i+1)%3==0)
-                {
-                    completeOrder=completeOrder+"\n";
-                }
+
                 
             }
             /*System.out.print(completeOrder);*/
-            Socket sock=new Socket("10.0.0.2",444);
+            Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
             PS.println(completeOrder);
             

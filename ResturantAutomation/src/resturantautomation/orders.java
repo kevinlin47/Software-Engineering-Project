@@ -5,17 +5,39 @@
  */
 package resturantautomation;
 
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  *
  * @author Kevin Lin
  */
 public class orders extends javax.swing.JFrame {
 
-    /**
-     * Creates new form orders
-     */
+    Timer timer=new Timer();
+    TimerTask task=new TimerTask()
+    {
+        public void run()
+        {
+            connectToServer();
+        }
+    };
     public orders() {
         initComponents();
+        timer.scheduleAtFixedRate(task, 1000, 5000);
+        
+       
     }
 
     /**
@@ -55,12 +77,12 @@ public class orders extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(doneButton, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                    .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(70, Short.MAX_VALUE))
+                    .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                    .addComponent(doneButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(28, 28, 28))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -68,7 +90,7 @@ public class orders extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -85,7 +107,51 @@ public class orders extends javax.swing.JFrame {
         chefPage.setVisible(true);
         this.hide();
     }//GEN-LAST:event_backButtonActionPerformed
+    
 
+    private void connectToServer()
+    {   
+        ArrayList<String>orderList=new ArrayList<String>();
+        try {
+            Socket sock=new Socket("192.168.43.56",1995);
+            PrintStream PS=new PrintStream(sock.getOutputStream());
+            PS.println("chef");
+            
+            InputStreamReader IR=new InputStreamReader(sock.getInputStream());
+            BufferedReader BR=new BufferedReader(IR);
+            
+            String message=BR.readLine();
+            
+            if (message.equals("Chef Connected"))
+            {   
+               DefaultListModel dlm=new DefaultListModel();
+               
+               while(BR.ready())
+               {
+                   orderList.add(BR.readLine());
+               }
+               
+               if (orderList.size()!=0)
+               {    
+                   for (int i=0;i<orderList.size();++i)
+                   {
+                       System.out.println(orderList.get(i));
+                       dlm.addElement(orderList.get(i));
+                   }
+                   jList1.setModel(dlm);
+               }
+       
+            }
+            else
+            {
+               JOptionPane.showMessageDialog(null,"Not Connected"); 
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(orders.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     /**
      * @param args the command line arguments
      */
@@ -117,6 +183,7 @@ public class orders extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new orders().setVisible(true);
+                
             }
         });
     }
