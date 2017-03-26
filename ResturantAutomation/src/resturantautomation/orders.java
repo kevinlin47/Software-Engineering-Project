@@ -24,7 +24,7 @@ import java.util.TimerTask;
  * @author Kevin Lin
  */
 public class orders extends javax.swing.JFrame {
-
+    
     Timer timer=new Timer();
     TimerTask task=new TimerTask()
     {
@@ -99,7 +99,50 @@ public class orders extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-        // TODO add your handling code here:
+    ArrayList<String>orderList=new ArrayList<String>();
+        try {
+            Socket sock=new Socket("192.168.43.56",1995);
+            PrintStream PS=new PrintStream(sock.getOutputStream());
+            PS.println("chef");
+            
+            InputStreamReader IR=new InputStreamReader(sock.getInputStream());
+            BufferedReader BR=new BufferedReader(IR);
+            
+            String message=BR.readLine();
+            
+            if (message.equals("Chef Connected"))
+            {   
+               
+               DefaultListModel dlm=new DefaultListModel();
+               while(BR.ready())
+               {
+                   orderList.add(BR.readLine());
+               }
+               
+               if (orderList.size()!=0)
+               {    
+                   for (int i=0;i<orderList.size();++i)
+                   {
+                       
+                       dlm.addElement(orderList.get(i));
+                   }
+                   String toRemove=jList1.getSelectedValue();
+                   System.out.print(toRemove);
+                   dlm.removeElement(jList1.getSelectedValue());
+                   jList1.setModel(dlm);
+                   PS.println(toRemove);
+               }
+       
+            }
+            else
+            {
+               JOptionPane.showMessageDialog(null,"Not Connected"); 
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(orders.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
@@ -124,8 +167,8 @@ public class orders extends javax.swing.JFrame {
             
             if (message.equals("Chef Connected"))
             {   
-               DefaultListModel dlm=new DefaultListModel();
                
+               DefaultListModel dlm=new DefaultListModel();
                while(BR.ready())
                {
                    orderList.add(BR.readLine());
@@ -135,7 +178,7 @@ public class orders extends javax.swing.JFrame {
                {    
                    for (int i=0;i<orderList.size();++i)
                    {
-                       System.out.println(orderList.get(i));
+                       
                        dlm.addElement(orderList.get(i));
                    }
                    jList1.setModel(dlm);
