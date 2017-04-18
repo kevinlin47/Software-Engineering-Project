@@ -17,6 +17,7 @@ public class Manager extends javax.swing.JFrame {
     public Manager() {
         initComponents();
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -27,21 +28,108 @@ public class Manager extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        viewStats = new javax.swing.JButton();
+        viewBudget = new javax.swing.JButton();
+        viewPay = new javax.swing.JButton();
+        logOut = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(500, 300));
+        setPreferredSize(new java.awt.Dimension(400, 300));
+
+        viewStats.setText("View Statistics");
+        viewStats.setMaximumSize(new java.awt.Dimension(150, 29));
+        viewStats.setMinimumSize(new java.awt.Dimension(110, 29));
+        viewStats.setPreferredSize(new java.awt.Dimension(139, 29));
+        viewStats.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewStatsActionPerformed(evt);
+            }
+        });
+
+        viewBudget.setText("Budget");
+        viewBudget.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewBudgetActionPerformed(evt);
+            }
+        });
+
+        viewPay.setLabel("Employee Payroll");
+        viewPay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewPayActionPerformed(evt);
+            }
+        });
+
+        logOut.setText("Log Out");
+        logOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logOutActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 882, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(126, 126, 126)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(viewStats, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(viewBudget, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(viewPay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logOut, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(545, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 529, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addComponent(viewStats, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(viewBudget, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(viewPay, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(logOut)
+                .addContainerGap(267, Short.MAX_VALUE))
         );
+
+        viewStats.getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    //Pressing the "View Statistics" button brings up the statistics window and closes the manager window
+    private void viewStatsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewStatsActionPerformed
+        // TODO add your handling code here:
+        viewStatistics statsPage = new viewStatistics();
+        statsPage.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_viewStatsActionPerformed
+
+    //Pressing the "Budget" button brings up the budget window and closes manager menu
+    private void viewBudgetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewBudgetActionPerformed
+        // TODO add your handling code here:
+        viewBudget budgetPage = new viewBudget();
+        budgetPage.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_viewBudgetActionPerformed
+
+    //Brings up the payroll windows and closes the manager menu
+    private void viewPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPayActionPerformed
+        // TODO add your handling code here:
+        viewPayroll payrollPage = new viewPayroll();
+        payrollPage.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_viewPayActionPerformed
+
+    //Logs manager out of system and goes back to login menu
+    private void logOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logOutActionPerformed
+    Login loginPage = new Login();
+        loginPage.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_logOutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +167,9 @@ public class Manager extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton logOut;
+    private javax.swing.JButton viewBudget;
+    private javax.swing.JButton viewPay;
+    private javax.swing.JButton viewStats;
     // End of variables declaration//GEN-END:variables
 }

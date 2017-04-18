@@ -5,17 +5,36 @@
  */
 package resturantautomation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Kevin Lin
  */
 public class Waiter extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Waiter
-     */
+    Timer timer=new Timer();
+    TimerTask task=new TimerTask()
+    {
+        public void run()
+        {
+          
+                checkUpdates();
+
+        }
+    };
     public Waiter() {
         initComponents();
+        timer.scheduleAtFixedRate(task, 1000, 7000);
     }
 
     /**
@@ -77,9 +96,31 @@ public class Waiter extends javax.swing.JFrame {
     private void newOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newOrderActionPerformed
         orderMenu menuPage=new orderMenu();
         menuPage.setVisible(true);
-        this.setVisible(false);
+        this.hide();
     }//GEN-LAST:event_newOrderActionPerformed
+    
+    private void checkUpdates() 
+    {
+        try {
+            Socket sock=new Socket("192.168.43.56",1995);
+            PrintStream PS=new PrintStream(sock.getOutputStream());
+            
+            InputStreamReader IR=new InputStreamReader(sock.getInputStream());
+            BufferedReader BR=new BufferedReader(IR);
+            PS.println("checking");
+            
+            String message=BR.readLine();
+            System.out.println(message);
+            
+            if (message.equals("orderComplete"))
+            {
+                JOptionPane.showMessageDialog(null,"An order has been completed");
+            }
 
+        } catch (IOException ex) {
+            Logger.getLogger(Waiter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * @param args the command line arguments
      */

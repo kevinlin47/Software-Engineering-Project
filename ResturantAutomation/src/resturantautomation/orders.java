@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +29,7 @@ import java.util.TimerTask;
  * @author Kevin Lin
  */
 public class orders extends javax.swing.JFrame {
-    
+    ArrayList<String>orderList=new ArrayList<String>();
     Timer timer=new Timer();
     TimerTask task=new TimerTask()
     {
@@ -35,7 +40,7 @@ public class orders extends javax.swing.JFrame {
     };
     public orders() {
         initComponents();
-        timer.scheduleAtFixedRate(task, 1000, 5000);
+        timer.scheduleAtFixedRate(task, 1000, 7000); //7000
         
        
     }
@@ -99,25 +104,21 @@ public class orders extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-    ArrayList<String>orderList=new ArrayList<String>();
+    
         try {
             Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
-            PS.println("chef");
+            /*PS.println("chef");*/
             
             InputStreamReader IR=new InputStreamReader(sock.getInputStream());
             BufferedReader BR=new BufferedReader(IR);
             
-            String message=BR.readLine();
+           
             
-            if (message.equals("Chef Connected"))
-            {   
+ 
                
                DefaultListModel dlm=new DefaultListModel();
-               while(BR.ready())
-               {
-                   orderList.add(BR.readLine());
-               }
+
                
                if (orderList.size()!=0)
                {    
@@ -127,16 +128,16 @@ public class orders extends javax.swing.JFrame {
                        dlm.addElement(orderList.get(i));
                    }
                    String toRemove=jList1.getSelectedValue();
-                   System.out.print(toRemove);
+                   toRemove="!"+toRemove;
                    dlm.removeElement(jList1.getSelectedValue());
                    jList1.setModel(dlm);
                    PS.println(toRemove);
                }
        
-            }
+            
             else
             {
-               JOptionPane.showMessageDialog(null,"Not Connected"); 
+               JOptionPane.showMessageDialog(null,"No order selected"); 
             }
             
         } catch (IOException ex) {
@@ -154,7 +155,8 @@ public class orders extends javax.swing.JFrame {
 
     private void connectToServer()
     {   
-        ArrayList<String>orderList=new ArrayList<String>();
+        /*ArrayList<String>orderList=new ArrayList<String>();*/
+        orderList.clear();
         try {
             Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
@@ -194,6 +196,50 @@ public class orders extends javax.swing.JFrame {
             Logger.getLogger(orders.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    private void updateInventory(String in)
+    {
+        try
+        {   
+            String[] ingrList, qList;//declaring the lists for ingredients
+            
+            //sql connections
+            Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
+            Statement st =conn.createStatement();
+            ResultSet rs = st.executeQuery("select * from menu where foodname = '"+in+"'"); //get the ingredients string, quantity string
+            
+            while (rs.next())
+            {             
+                ingrList = rs.getString(3).split(", "); //splitting the strings
+                qList = rs.getString(5).split(", ");
+                
+                for(int i = 0; i < ingrList.length; i++) //handing each ingredient
+                {
+                    //sql connections
+                    Connection connTemp=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
+                    Statement stTemp =connTemp.createStatement();
+                    ResultSet rsTemp = stTemp.executeQuery("select * from ingredients where name = '"+ingrList[i]+"'");
+                    if(rsTemp.last()) //ingredient found
+                    {
+                        int currentQuantity = Integer.parseInt(rsTemp.getString(2)) - Integer.parseInt(qList[i]); //calculating the amount of inventory left
+                        stTemp.executeUpdate("update ingredients set quantity = '"+currentQuantity+"' where name = '"+ingrList[i]+"'");
+                        if(currentQuantity <=0)
+                        {
+                            JOptionPane.showMessageDialog(null,ingrList[i] + " has run out!");
+                        }
+                    }
+                    else //ingredient not found
+                    {
+                        stTemp.executeUpdate("insert into ingredients values('"+ingrList[i]+"', "+(-Integer.parseInt(qList[i]))+", 0)");
+                        JOptionPane.showMessageDialog(null,"Ingredient not found, added to database with defaults.");
+                    }
+                }
+            }
+        } 
+        catch (SQLException ex)
+        {
+            Logger.getLogger(inventory.class.getName()).log(Level.SEVERE,null,ex);
+        }
     }
     /**
      * @param args the command line arguments

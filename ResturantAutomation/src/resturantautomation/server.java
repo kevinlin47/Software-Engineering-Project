@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * @author Kevin Lin
  */
 public class server {
-    
+    boolean done=false;
     public static void main(String args[]) throws Exception
     {
         server server_1=new server();
@@ -48,11 +48,11 @@ public void run() throws Exception
     BufferedReader BR=new BufferedReader(IR);
     
     String message="";
-
+    
 
 
     message=BR.readLine();
-    
+    char a_char=message.charAt(0);
     
     
     if (message.equals("chef"))
@@ -63,6 +63,31 @@ public void run() throws Exception
         for (int i=0;i<orderList.size();++i)
         {
             ps.println(orderList.get(i));
+        }
+    }
+    else if(a_char=='!')
+    {   
+        message=message.substring(1);
+        if (orderList.remove(message))
+        {
+            System.out.println("Success");
+            PrintStream ps=new PrintStream(sock.getOutputStream());
+            ps.println("orderComplete");
+            done=true;
+        }
+    }
+    else if(message.equals("checking"))
+    {   
+        PrintStream ps=new PrintStream(sock.getOutputStream());
+        if (done==true)
+        {   
+            
+            ps.println("orderComplete");
+            done=false;
+        }
+        else
+        {
+            ps.println("notComplete");
         }
     }
     else
