@@ -28,7 +28,8 @@ public class server {
     public static void main(String args[]) throws Exception
     {
         server server_1=new server();
-
+            Login log=new Login();
+            log.setVisible(true);
             server_1.run();
         
         

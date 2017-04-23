@@ -48,6 +48,7 @@ public class Waiter extends javax.swing.JFrame {
 
         newOrder = new javax.swing.JButton();
         viewTable = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,15 +66,23 @@ public class Waiter extends javax.swing.JFrame {
             }
         });
 
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(201, 201, 201)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(viewTable, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(newOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(newOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(209, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -83,14 +92,23 @@ public class Waiter extends javax.swing.JFrame {
                 .addComponent(newOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
                 .addComponent(viewTable, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(81, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    private void displayTables()
+    {
+        this.setVisible(false);
+        Tables tables=new Tables();
+        tables.setVisible(true);
+    }
+    
     private void viewTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewTableActionPerformed
-        // TODO add your handling code here:
+        displayTables();
     }//GEN-LAST:event_viewTableActionPerformed
 
     private void newOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newOrderActionPerformed
@@ -98,6 +116,13 @@ public class Waiter extends javax.swing.JFrame {
         menuPage.setVisible(true);
         this.hide();
     }//GEN-LAST:event_newOrderActionPerformed
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        this.dispose();
+        Login login=new Login();
+        login.setVisible(true);
+                
+    }//GEN-LAST:event_backButtonActionPerformed
     
     private void checkUpdates() 
     {
@@ -157,6 +182,7 @@ public class Waiter extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
     private javax.swing.JButton newOrder;
     private javax.swing.JButton viewTable;
     // End of variables declaration//GEN-END:variables
