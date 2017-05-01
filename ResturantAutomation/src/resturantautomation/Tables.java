@@ -46,7 +46,7 @@ public class Tables extends javax.swing.JFrame {
     
     public Tables() {
         initComponents();
-        timer.scheduleAtFixedRate(task, 1000, 10000);
+        timer.scheduleAtFixedRate(task, 1000, 15000);
     }
 
     /**

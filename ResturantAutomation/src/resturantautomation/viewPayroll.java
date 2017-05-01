@@ -5,6 +5,19 @@
  */
 package resturantautomation;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.text.DecimalFormat;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author kimberlyngai
@@ -14,8 +27,77 @@ public class viewPayroll extends javax.swing.JFrame {
     /**
      * Creates new form viewPayroll
      */
+    
+    DefaultTableModel dm;
+    DecimalFormat df = new DecimalFormat("0.00");
+    private Double overallP = 0.00;
+    
+    private void setTable()
+    {
+        dm = new DefaultTableModel(0, 0);  
+        String s[] = new String[]{"Employee ID", "Name", "Job Title" , "Hourly Rate", "Total Hours Worked", "Total Pay", "Bonus", "Final Pay"};  
+        dm.setColumnIdentifiers(s);  
+        jTable1.setModel(dm);  
+    }
+    
+    private void getData()
+    {
+        boolean success=false;
+        
+        int emID;
+        String emName, jTitle, hRate, totHr, totP, bonus, fP;
+            
+        try{
+            Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/employeeDB","root","password");
+                  
+            Statement st =conn.createStatement();
+                        
+            ResultSet rs = st.executeQuery("SELECT * FROM employeeRecords");
+            
+            while (rs.next())
+            {
+                //String bName = rs.getString(1);
+                //String aB = rs.getString(2);
+                //String aS = rs.getString(3);
+                //String aR = rs.getString(4);
+                
+                emID = rs.getInt(1);
+                emName = rs.getString(3) + " " + rs.getString(2);
+                jTitle = rs.getString(4);
+                hRate = df.format(rs.getDouble(5));
+                totHr = rs.getString(9);
+                totP = rs.getString(10);
+                bonus = df.format(rs.getDouble(11));
+                fP = df.format(rs.getDouble(13));
+                
+                overallP += rs.getDouble(13);
+                
+                Vector <Object> v = new Vector<Object>();
+                
+                v.add(emID);
+                v.add(emName);
+                v.add(jTitle);
+                v.add(hRate);
+                v.add(totHr);
+                v.add(totP);
+                v.add(bonus);
+                v.add(fP);
+                
+                dm.addRow(v);
+
+            }
+            success=true;
+        }catch (SQLException ex)
+        {   
+            success=false;
+            Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+        }
+    }
+    
     public viewPayroll() {
         initComponents();
+        setTable();  
+        getData(); 
     }
 
     /**
@@ -28,10 +110,10 @@ public class viewPayroll extends javax.swing.JFrame {
     private void initComponents() {
 
         returnButton = new javax.swing.JButton();
-        jScrollBar1 = new javax.swing.JScrollBar();
         jScrollPane11 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        submitButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,26 +158,42 @@ public class viewPayroll extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane11.setViewportView(jTable1);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 27)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel1.setText("PAYROLL");
+
+        submitButton.setBackground(new java.awt.Color(255, 255, 255));
+        submitButton.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        submitButton.setText("Submit Payroll");
+        submitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                submitButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(380, 380, 380)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(returnButton)
-                    .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 917, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane11)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(returnButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(submitButton)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(405, 405, 405)
+                .addComponent(jLabel1)
+                .addContainerGap(419, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -103,11 +201,11 @@ public class viewPayroll extends javax.swing.JFrame {
                 .addGap(8, 8, 8)
                 .addComponent(jLabel1)
                 .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 466, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                .addComponent(returnButton)
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(returnButton)
+                    .addComponent(submitButton))
                 .addContainerGap())
         );
 
@@ -120,6 +218,65 @@ public class viewPayroll extends javax.swing.JFrame {
         this.setVisible(false);
             // TODO add your handling code here: // TODO add your handling code here:
     }//GEN-LAST:event_returnButtonActionPerformed
+
+    private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
+        // TODO add your handling code here:
+        boolean success = false;
+        try{
+            Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/employeeDB","root","password");
+
+            Statement st =conn.createStatement();
+
+            //ResultSet rs = st.executeQuery("SELECT * FROM employeeRecords");
+            Statement st2 = conn.createStatement();
+            
+            String sqlStatement1 = "select clockIn, clockOut, totalHours, totalPay, hourlyRate from employeeDB.employeeRecords";
+
+            ResultSet rs1 = st.executeQuery(sqlStatement1);
+
+            if (rs1.next())
+            {
+                String sqlStatement = "update employeeDB.employeeRecords set clockIn = null, clockOut = null, hoursWorked = 0.00, totalHours = 0.00, totalPay = 0.00, bonus = 0.00, lastPunch = null, finalPay = 0.00";
+                st2.executeUpdate(sqlStatement);
+                
+                Connection conn1=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+                Statement st3 = conn1.createStatement();
+                sqlStatement = "select AmountBudgeted from budgetDB.budgetTable where TypeOfExpense = 'Employees'";
+                ResultSet rs2 = st3.executeQuery(sqlStatement);
+                
+                if (rs2.next())
+                {
+                    Double amtBu = rs2.getDouble(1);
+                    sqlStatement = "update budgetDB.budgetTable set AmountSpent = "+overallP+", AmountRemaining = "+(amtBu-overallP)+"where TypeOfExpense = 'Employees'";
+                    Statement st4 = conn1.createStatement();
+                    st4.executeUpdate(sqlStatement);
+                }
+            }
+            
+            success = true;
+        }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+        
+        if (success == true)
+        {
+            JOptionPane.showMessageDialog(null, "Payroll sent. Payroll have been reset.");
+        }
+        
+        else if (success == false)
+        {
+            JOptionPane.showMessageDialog(null, "Error sending payroll.", null, JOptionPane.ERROR_MESSAGE);
+        }
+        setTable();
+        getData(); 
+    }//GEN-LAST:event_submitButtonActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jTable1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -158,9 +315,9 @@ public class viewPayroll extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane11;
     private javax.swing.JTable jTable1;
     private javax.swing.JButton returnButton;
+    private javax.swing.JButton submitButton;
     // End of variables declaration//GEN-END:variables
 }

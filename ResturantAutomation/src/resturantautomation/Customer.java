@@ -37,6 +37,7 @@ public class Customer extends javax.swing.JFrame {
 
         logoPicture = new javax.swing.JLabel();
         surveyButton = new javax.swing.JButton();
+        orderButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -46,6 +47,8 @@ public class Customer extends javax.swing.JFrame {
                 surveyButtonActionPerformed(evt);
             }
         });
+
+        orderButton.setText("Create Order");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -57,7 +60,9 @@ public class Customer extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(140, 140, 140)
-                .addComponent(surveyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(surveyButton, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                    .addComponent(orderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -67,7 +72,9 @@ public class Customer extends javax.swing.JFrame {
                 .addComponent(logoPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(surveyButton)
-                .addGap(146, 146, 146))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(orderButton)
+                .addGap(111, 111, 111))
         );
 
         pack();
@@ -132,6 +139,7 @@ private void displayPicture()
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel logoPicture;
+    private javax.swing.JButton orderButton;
     private javax.swing.JButton surveyButton;
     // End of variables declaration//GEN-END:variables
 }

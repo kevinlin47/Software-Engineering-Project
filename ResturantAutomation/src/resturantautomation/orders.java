@@ -23,6 +23,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -94,9 +96,9 @@ public class orders extends javax.swing.JFrame {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -104,7 +106,9 @@ public class orders extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-    
+        boolean succeed = true;
+        String selection = jList1.getSelectedValue();
+        
         try {
             Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
@@ -112,38 +116,60 @@ public class orders extends javax.swing.JFrame {
             
             InputStreamReader IR=new InputStreamReader(sock.getInputStream());
             BufferedReader BR=new BufferedReader(IR);
-            
            
-            
- 
-               
-               DefaultListModel dlm=new DefaultListModel();
+            DefaultListModel dlm=new DefaultListModel();
 
                
-               if (orderList.size()!=0)
-               {    
-                   for (int i=0;i<orderList.size();++i)
-                   {
-                       
-                       dlm.addElement(orderList.get(i));
-                   }
-                   String toRemove=jList1.getSelectedValue();
-                   toRemove="!"+toRemove;
-                   dlm.removeElement(jList1.getSelectedValue());
-                   jList1.setModel(dlm);
-                   PS.println(toRemove);
-               }
-       
-            
+            if (!jList1.isSelectionEmpty())
+            {    
+                for (int i=0;i<orderList.size();++i)
+                {
+                    dlm.addElement(orderList.get(i));
+                }
+                String toRemove=jList1.getSelectedValue();
+                toRemove="!"+toRemove;
+                dlm.removeElement(jList1.getSelectedValue());
+                jList1.setModel(dlm);
+                PS.println(toRemove);
+            }
             else
             {
-               JOptionPane.showMessageDialog(null,"No order selected"); 
+                succeed = false;
+                JOptionPane.showMessageDialog(null,"No order selected"); 
             }
             
         } catch (IOException ex) {
             Logger.getLogger(orders.class.getName()).log(Level.SEVERE, null, ex);
         }
        
+        String err = "";
+        if (succeed) //if the user has something selected
+        {
+            String[] orderList2;
+            orderList2 = selection.split(","); //splitting the string into several parts
+            String[] fixList = orderList2[orderList2.length - 1].split(";"); //getting rid of the semicolon
+            orderList2[orderList2.length-1] = fixList[0]; //updating the original list
+            
+            try
+            {                    
+            //sql connections
+            Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
+            Statement st =conn.createStatement();
+                for (int i = 0; i < orderList2.length; i++)
+                {
+                    st.executeUpdate("INSERT INTO `menudb`.`timedb` VALUES('"+orderList2[i]+"', '"+LocalDateTime.now()+"')"); //adds a time instance
+                    err = err + updateInventory(orderList2[i]);
+                }
+            } 
+            catch (SQLException ex)
+            {
+                Logger.getLogger(inventory.class.getName()).log(Level.SEVERE,null,ex);
+            }
+        }           
+        if (err.length() > 1)
+        {
+          JOptionPane.showMessageDialog(null,err);  
+        }
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
@@ -180,7 +206,6 @@ public class orders extends javax.swing.JFrame {
                {    
                    for (int i=0;i<orderList.size();++i)
                    {
-                       
                        dlm.addElement(orderList.get(i));
                    }
                    jList1.setModel(dlm);
@@ -197,8 +222,9 @@ public class orders extends javax.swing.JFrame {
         }
         
     }
-    private void updateInventory(String in)
+    private String updateInventory(String in)
     {
+        String ret = "";
         try
         {   
             String[] ingrList, qList;//declaring the lists for ingredients
@@ -225,13 +251,13 @@ public class orders extends javax.swing.JFrame {
                         stTemp.executeUpdate("update ingredients set quantity = '"+currentQuantity+"' where name = '"+ingrList[i]+"'");
                         if(currentQuantity <=0)
                         {
-                            JOptionPane.showMessageDialog(null,ingrList[i] + " has run out!");
+                            ret = ret + "\n" + ingrList[i] + " has run out!";
                         }
                     }
                     else //ingredient not found
                     {
                         stTemp.executeUpdate("insert into ingredients values('"+ingrList[i]+"', "+(-Integer.parseInt(qList[i]))+", 0)");
-                        JOptionPane.showMessageDialog(null,"Ingredient not found, added to database with defaults.");
+                        ret = ret + "\nIngredient " +ingrList[i]+ " not found, added to database with defaults.";
                     }
                 }
             }
@@ -240,6 +266,7 @@ public class orders extends javax.swing.JFrame {
         {
             Logger.getLogger(inventory.class.getName()).log(Level.SEVERE,null,ex);
         }
+        return ret;
     }
     /**
      * @param args the command line arguments

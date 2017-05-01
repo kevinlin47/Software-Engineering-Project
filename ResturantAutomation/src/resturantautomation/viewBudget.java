@@ -4,12 +4,20 @@
  * and open the template in the editor.
  */
 package resturantautomation;
-import java.util.Random;    //For randomizing values for budget since nothing is concrete for now 
-import java.lang.Double;    //Display values up to two decimal places
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList; //For list to fill in table
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -20,108 +28,71 @@ public class viewBudget extends javax.swing.JFrame {
     /**
      * Creates new form viewBugdet
      */
-    
-    DefaultTableModel model;
-    
-    public viewBudget() {
-        initComponents();
-        addRowtoJTable();
-    }
-    
-    //creat class for items in the table
-    public class budgetItem{
-        public String budgetName;
-        public Double budgetAmount;
-        public Double budgetSpent;
-        public Double budgetRemaining; //based on budgetAmount and budgetSpent
-        
-        //constructor
-        public budgetItem(String name, Double amt, Double spt)
-        {
-            //DecimalFormat df = new DecimalFormat("#.00");
-            //NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-            this.budgetName = name;
-            this.budgetAmount = amt;
-            this.budgetSpent = spt;
-            this.budgetRemaining = Double.parseDouble(String.format("%.2f", amt-spt));
-            //this.dumAmount = amount;
-            //this.dumSpent = spent;
-            
-        }
-    }
-    
-    //creates the array to save values for future use
-    public class budgetArray{
-        Double[] arrayAmount = new Double[5];
-        Double[] arraySpent = new Double[5];
-        
-        public budgetArray()
-        {
-            Random r = new Random();
-            for (int i = 0; i < 5; i++)
-            {
-                Double dum = 1000.00 + 500.00 * r.nextDouble();
-                dum = Double.parseDouble(String.format("%.2f", dum));
-                arrayAmount[i] = dum;
                 
-                Double temp = 100.00 + 900.00 * r.nextDouble();
-                temp = Double.parseDouble(String.format("%.2f", temp));
-                arraySpent[i] = temp;
+    DefaultTableModel dm;
+    
+    public viewBudget() 
+    {
+        initComponents();
+        setTable();  
+        getData(); 
+    }
+    
+    private void setTable()
+    {
+        dm = new DefaultTableModel(0, 0);  
+        String s[] = new String[]{"Type of Expense", "Amount Budgeted", "Amount Spent", "Amount Remaining"};  
+        dm.setColumnIdentifiers(s);  
+        jTable1.setModel(dm);  
+    }
+    
+    private void getData()
+    {
+        boolean success=false;
+        boolean overspent = false;
+        
+        String budgetName;
+        Double amountB, amountS, amountR;
+            
+        try{
+            Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+                  
+            Statement st =conn.createStatement();
+                        
+            ResultSet rs = st.executeQuery("SELECT * FROM budgetTable");
+            
+            while (rs.next())
+            {
+                String bName = rs.getString(1);
+                String aB = rs.getString(2);
+                String aS = rs.getString(3);
+                String aR = rs.getString(4);
+                Double amR = rs.getDouble(4);
+                
+                if (amR < 0)
+                {
+                    overspent = true;
+                }
+                
+                Vector <Object> v = new Vector<Object>();
+                
+                v.add(bName);
+                v.add(aB);
+                v.add(aS);
+                v.add(aR);
+                
+                dm.addRow(v);
+                //System.out.println("hi");
             }
+            success=true;
+        }catch (SQLException ex)
+        {   
+            success=false;
+            Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
         }
-        
-        public void setArray(int index, Double amt, Double spt)
+        if (overspent == true)
         {
-            arrayAmount[index] = amt;
-            arraySpent[index] = spt;
-        }
-        
-        public Double getArrayAmount(int index)
-        {
-            return Double.parseDouble(String.format("%.2f", arrayAmount[index]));
-        }
-        
-        public Double getArraySpent(int index)
-        {
-            return Double.parseDouble(String.format("%.2f", arraySpent[index]));
-        }
-    }
-    
-    //declared outside since it needs to be accessed by other classes/functions
-    budgetArray b1 = new budgetArray();
-    
-    //builds list from budget items
-    public ArrayList budgetList()
-    {
-        ArrayList<budgetItem> list = new ArrayList<budgetItem>();
-        budgetItem food = new budgetItem("Food", b1.getArrayAmount(0), b1.getArraySpent(0));
-        budgetItem employee = new budgetItem("Employees", b1.getArrayAmount(1), b1.getArraySpent(1));
-        budgetItem maintenance = new budgetItem("Maintenance", b1.getArrayAmount(2), b1.getArraySpent(2));
-        budgetItem rent = new budgetItem("Rent", b1.getArrayAmount(3), b1.getArraySpent(3));
-        budgetItem other = new budgetItem("Other", b1.getArrayAmount(4), b1.getArraySpent(4));
-        
-        list.add(food);
-        list.add(employee);
-        list.add(maintenance);
-        list.add(rent);
-        list.add(other);
-        
-        return list;
-    }
-    
-    //adds list to table to display
-    public void addRowtoJTable()
-    {
-        model = (DefaultTableModel) jTable1.getModel();
-        ArrayList<budgetItem> list = budgetList();
-        Object rowData[] = new Object[4];
-        for(int i = 0; i < list.size(); i++)
-        {
-            rowData[0] = list.get(i).budgetName;
-            rowData[1] = list.get(i).budgetAmount;
-            rowData[2] = list.get(i).budgetSpent;
-            rowData[3] = list.get(i).budgetRemaining;
-            model.addRow(rowData);
+            JOptionPane.showMessageDialog(null, "Expense is spending over allocated budget!", "ATTENTION", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -146,9 +117,10 @@ public class viewBudget extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         editButton = new javax.swing.JButton();
+        showPosSpend = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(869, 500));
+        setPreferredSize(new java.awt.Dimension(800, 380));
 
         returnButton.setText("Return");
         returnButton.addActionListener(new java.awt.event.ActionListener() {
@@ -164,15 +136,7 @@ public class viewBudget extends javax.swing.JFrame {
             new String [] {
                 "Type of Expense", "Amount Budgeted", "Amount Spent", "Amount Remaining"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, true, true, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 selectItem(evt);
@@ -180,7 +144,7 @@ public class viewBudget extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
 
-        budgetTitle.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        budgetTitle.setFont(new java.awt.Font("Lucida Grande", 1, 20)); // NOI18N
         budgetTitle.setText("Budget");
 
         jScrollPane2.setViewportView(expensePane);
@@ -191,10 +155,18 @@ public class viewBudget extends javax.swing.JFrame {
 
         jLabel3.setText("Amount Spent");
 
-        editButton.setText("Confirm Edit");
+        editButton.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        editButton.setText("Confirm Changes");
         editButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editButtonActionPerformed(evt);
+            }
+        });
+
+        showPosSpend.setText("Show Possible Expense Spending");
+        showPosSpend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showPosSpendActionPerformed(evt);
             }
         });
 
@@ -202,61 +174,63 @@ public class viewBudget extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(433, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(budgetTitle)
-                        .addGap(396, 396, 396))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(63, 63, 63)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(amtField, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
-                                    .addComponent(sptField))
-                                .addGap(24, 24, 24))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(57, 57, 57)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(editButton, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane2))
-                                .addGap(366, 366, 366))))
+                                .addComponent(returnButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(showPosSpend)))
+                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(returnButton)
-                        .addContainerGap())))
+                        .addGap(0, 491, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sptField, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(amtField, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(349, 349, 349))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(editButton)
+                                .addGap(331, 331, 331))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(budgetTitle)
+                                .addGap(384, 384, 384))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(budgetTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(28, 28, 28)
-                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(amtField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sptField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(amtField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sptField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
                 .addComponent(editButton)
-                .addGap(132, 132, 132)
-                .addComponent(returnButton)
-                .addGap(313, 313, 313))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(returnButton)
+                    .addComponent(showPosSpend))
+                .addGap(421, 421, 421))
         );
 
         pack();
@@ -274,9 +248,11 @@ public class viewBudget extends javax.swing.JFrame {
     
     private void selectItem(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_selectItem
         // TODO add your handling code here:
-        expensePane.setText(String.valueOf(model.getValueAt(jTable1.getSelectedRow(), 0)));
-        amtField.setText(String.valueOf(model.getValueAt(jTable1.getSelectedRow(), 1)));
-        sptField.setText(String.valueOf(model.getValueAt(jTable1.getSelectedRow(), 2)));
+        expensePane.setText(String.valueOf(dm.getValueAt(jTable1.getSelectedRow(), 0)));
+        amtField.setText(String.valueOf(dm.getValueAt(jTable1.getSelectedRow(), 1)));
+        sptField.setText(String.valueOf(dm.getValueAt(jTable1.getSelectedRow(), 2)));
+        
+        expensePane.setEditable(false);
         
         itemName = expensePane.getText();
     }//GEN-LAST:event_selectItem
@@ -284,53 +260,180 @@ public class viewBudget extends javax.swing.JFrame {
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         // TODO add your handling code here:
         
-        model.setValueAt(amtField.getText(), jTable1.getSelectedRow(), 1);
-        model.setValueAt(sptField.getText(), jTable1.getSelectedRow(), 2);
+        dm.setValueAt(amtField.getText(), jTable1.getSelectedRow(), 1);
+        dm.setValueAt(sptField.getText(), jTable1.getSelectedRow(), 2);
+        
+        DecimalFormat df = new DecimalFormat("0.00");
         
         Double newAmt = Double.parseDouble(amtField.getText());
         Double newSpt = Double.parseDouble(sptField.getText());
+        Double newRn = newAmt - newSpt;
         
-        //based on expense name, the array will update values corresponding to it
+        String newRmn = df.format(newRn);
+        
+        //based on expense name, the SQL will update values corresponding to it
         if (itemName.equals("Food"))
         {
-            b1.setArray(0, newAmt, newSpt);
+            dm.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
             
-            //following line is a simple "test" to ensure the array values are updated correctly
-            Double newRmn = b1.getArrayAmount(0) - b1.getArraySpent(0);
+            boolean success=false;
+        
+            try{
+                Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+
+                Statement st =conn.createStatement();
+                String sqlStatment = "UPDATE budgetTable SET AmountBudgeted = " +newAmt+ ", AmountSpent = " +newSpt+ ", AmountRemaining = " +newRn+ " WHERE TypeOfExpense = '" +itemName+ "'";
+                st.executeUpdate(sqlStatment);
+                success=true;
+            }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
+            if (success==true)
+            {
+                JOptionPane.showMessageDialog(null, "Update successful.");
+            }
             
-            //displaying the new amount remaining value depends on the array storing values correctly
-            model.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            else if (success==false)
+            {
+                JOptionPane.showMessageDialog(null, "Error.", null, JOptionPane.ERROR_MESSAGE);
+            }
         }
         
         else if (itemName.equals("Employees"))
         {
-            b1.setArray(1, newAmt, newSpt);
-            Double newRmn = b1.getArrayAmount(1) - b1.getArraySpent(1);
-            model.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            dm.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            
+            boolean success=false;
+        
+            try{
+                Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+
+                Statement st =conn.createStatement();
+                String sqlStatment = "UPDATE budgetTable SET AmountBudgeted = " +newAmt+ ", AmountSpent = " +newSpt+ ", AmountRemaining = " +newRn+ " WHERE TypeOfExpense = '" +itemName+ "'";
+                st.executeUpdate(sqlStatment);
+                success=true;
+            }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
+            if (success==true)
+            {
+                JOptionPane.showMessageDialog(null, "Update successful.");
+            }
+            
+            else if (success==false)
+            {
+                JOptionPane.showMessageDialog(null, "Error.", null, JOptionPane.ERROR_MESSAGE);
+            }
         }
         
         else if (itemName.equals("Maintenance"))
         {
-            b1.setArray(2, newAmt, newSpt);
-            Double newRmn = b1.getArrayAmount(2) - b1.getArraySpent(2);
-            model.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            dm.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            
+            boolean success=false;
+        
+            try{
+                Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+
+                Statement st =conn.createStatement();
+                String sqlStatment = "UPDATE budgetTable SET AmountBudgeted = " +newAmt+ ", AmountSpent = " +newSpt+ ", AmountRemaining = " +newRn+ " WHERE TypeOfExpense = '" +itemName+ "'";
+                st.executeUpdate(sqlStatment);
+                success=true;
+            }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
+            if (success==true)
+            {
+                JOptionPane.showMessageDialog(null, "Update successful.");
+            }
+            
+            else if (success==false)
+            {
+                JOptionPane.showMessageDialog(null, "Error.", null, JOptionPane.ERROR_MESSAGE);
+            }
         }
         
         else if (itemName.equals("Rent"))
         {
-            b1.setArray(3, newAmt, newSpt);
-            Double newRmn = b1.getArrayAmount(3) - b1.getArraySpent(3);
-            model.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            dm.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            
+            boolean success=false;
+        
+            try{
+                Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+
+                Statement st =conn.createStatement();
+                String sqlStatment = "UPDATE budgetTable SET AmountBudgeted = " +newAmt+ ", AmountSpent = " +newSpt+ ", AmountRemaining = " +newRn+ " WHERE TypeOfExpense = '" +itemName+ "'";
+                st.executeUpdate(sqlStatment);
+                success=true;
+            }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
+            if (success==true)
+            {
+                JOptionPane.showMessageDialog(null, "Update successful.");
+            }
+            
+            else if (success==false)
+            {
+                JOptionPane.showMessageDialog(null, "Error.", null, JOptionPane.ERROR_MESSAGE);
+            }
         }
         
         else
         {
-            b1.setArray(4, newAmt, newSpt);
-            Double newRmn = b1.getArrayAmount(4) - b1.getArraySpent(4);
-            model.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
-        }
+            dm.setValueAt(newRmn, jTable1.getSelectedRow(), 3);
+            
+            boolean success=false;
         
+            try{
+                Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/budgetDB","root","password");
+
+                Statement st =conn.createStatement();
+                String sqlStatment = "UPDATE budgetTable SET AmountBudgeted = " +newAmt+ ", AmountSpent = " +newSpt+ ", AmountRemaining = " +newRn+ " WHERE TypeOfExpense = '" +itemName+ "'";
+                st.executeUpdate(sqlStatment);
+                success=true;
+            }catch (SQLException ex)
+            {   
+                success=false;
+                Logger.getLogger(addItem.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
+            if (success==true)
+            {
+                JOptionPane.showMessageDialog(null, "Update successful. Click on 'Refresh' Button to see changes.");
+            }
+            
+            else if (success==false)
+            {
+                JOptionPane.showMessageDialog(null, "Error.", null, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        if (newRn < 0)
+        {
+            JOptionPane.showMessageDialog(null, "Expense is spending over allocated budget!", "ATTENTION", JOptionPane.ERROR_MESSAGE);
+        }
+        //setTable();
+        //getData();
     }//GEN-LAST:event_editButtonActionPerformed
+
+    private void showPosSpendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPosSpendActionPerformed
+        // TODO add your handling code here:
+        expenseSpending exSp = new expenseSpending();
+        exSp.setVisible(true);
+    }//GEN-LAST:event_showPosSpendActionPerformed
 
     /**
      * @param args the command line arguments
@@ -384,6 +487,7 @@ public class viewBudget extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JButton returnButton;
+    private javax.swing.JButton showPosSpend;
     private javax.swing.JTextField sptField;
     // End of variables declaration//GEN-END:variables
 }

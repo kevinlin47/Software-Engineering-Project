@@ -5,6 +5,7 @@
  */
 package resturantautomation;
 
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -32,6 +33,7 @@ public class inventory extends javax.swing.JFrame {
     {
         initComponents();
         populateList();
+        getContentPane().setBackground(new Color(128, 0, 0));
     }
     
     public List<String> qlist = new ArrayList<String>();
@@ -54,20 +56,27 @@ public class inventory extends javax.swing.JFrame {
         jButtonRemove = new javax.swing.JButton();
         jButtonEdit = new javax.swing.JButton();
         jButtonNew = new javax.swing.JButton();
-        jTextFieldQuantity = new javax.swing.JTextField();
-        jTextFieldCost = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jTextFieldQuantity = new javax.swing.JFormattedTextField();
+        jTextFieldCost = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jListName.setBackground(new java.awt.Color(103, 102, 102));
+        jListName.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
         jListName.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jListName.setToolTipText("");
         jScrollPane2.setViewportView(jListName);
 
+        jLabel1.setFont(new java.awt.Font("DejaVu Serif", 1, 18)); // NOI18N
         jLabel1.setText("Quantity:");
 
+        jLabel2.setFont(new java.awt.Font("DejaVu Serif", 1, 18)); // NOI18N
         jLabel2.setText("Unit Cost:");
 
+        jButtonView.setBackground(new java.awt.Color(0, 0, 0));
+        jButtonView.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
+        jButtonView.setForeground(new java.awt.Color(255, 255, 255));
         jButtonView.setText("View Selected Info");
         jButtonView.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -75,6 +84,9 @@ public class inventory extends javax.swing.JFrame {
             }
         });
 
+        jButtonRemove.setBackground(new java.awt.Color(0, 0, 0));
+        jButtonRemove.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
+        jButtonRemove.setForeground(new java.awt.Color(255, 255, 255));
         jButtonRemove.setText("Remove Selected");
         jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -82,6 +94,9 @@ public class inventory extends javax.swing.JFrame {
             }
         });
 
+        jButtonEdit.setBackground(new java.awt.Color(0, 0, 0));
+        jButtonEdit.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
+        jButtonEdit.setForeground(new java.awt.Color(255, 255, 255));
         jButtonEdit.setText("Edit Selected");
         jButtonEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,6 +104,9 @@ public class inventory extends javax.swing.JFrame {
             }
         });
 
+        jButtonNew.setBackground(new java.awt.Color(0, 0, 0));
+        jButtonNew.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
+        jButtonNew.setForeground(new java.awt.Color(255, 255, 255));
         jButtonNew.setText("Add New");
         jButtonNew.setToolTipText("");
         jButtonNew.addActionListener(new java.awt.event.ActionListener() {
@@ -97,18 +115,21 @@ public class inventory extends javax.swing.JFrame {
             }
         });
 
-        jTextFieldCost.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextFieldCostActionPerformed(evt);
-            }
-        });
-
+        jButton1.setBackground(new java.awt.Color(0, 0, 0));
+        jButton1.setFont(new java.awt.Font("DejaVu Serif", 1, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Back");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        jTextFieldQuantity.setBackground(new java.awt.Color(153, 153, 153));
+        jTextFieldQuantity.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("###0.###"))));
+
+        jTextFieldCost.setBackground(new java.awt.Color(153, 153, 153));
+        jTextFieldCost.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("###0.###"))));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -125,8 +146,8 @@ public class inventory extends javax.swing.JFrame {
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldCost)
-                            .addComponent(jTextFieldQuantity)))
+                            .addComponent(jTextFieldQuantity)
+                            .addComponent(jTextFieldCost)))
                     .addComponent(jButtonView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonRemove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -138,50 +159,56 @@ public class inventory extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextFieldQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextFieldCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonView)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonEdit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonNew)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButtonRemove))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButtonView)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButtonEdit)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButtonNew)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addGap(15, 15, 15)
+                .addComponent(jButtonRemove)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewActionPerformed
-        jTextFieldCost.setText(plist.get(jListName.getSelectedIndex()));
-        jTextFieldQuantity.setText(qlist.get(jListName.getSelectedIndex()));
+        if (!jListName.isSelectionEmpty())
+        {   
+            jTextFieldCost.setText(plist.get(jListName.getSelectedIndex()));
+             jTextFieldQuantity.setText(qlist.get(jListName.getSelectedIndex()));
+        }
         
     }//GEN-LAST:event_jButtonViewActionPerformed
 
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
         // TODO add your handling code here:
+        if (!jListName.isSelectionEmpty())
+        {
         try{                    
             //sql connections
             Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
             Statement st =conn.createStatement();
             st.executeUpdate("DELETE FROM `menudb`.`ingredients` WHERE `name`='"+jListName.getSelectedValue()+"'"); //delete command
             populateList(); //resetting the display
+            jTextFieldCost.setText("");
+            jTextFieldQuantity.setText("");
         } catch (SQLException ex)
             {
                 Logger.getLogger(inventory.class.getName()).log(Level.SEVERE,null,ex);
-            }  
+            } 
+        }
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewActionPerformed
@@ -196,16 +223,13 @@ public class inventory extends javax.swing.JFrame {
             Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
             Statement st =conn.createStatement();
             st.executeUpdate("UPDATE `menudb`.`ingredients` SET `quantity`='"+jTextFieldQuantity.getText()+"' WHERE `name`='"+jListName.getSelectedValue()+"'");
+            st.executeUpdate("UPDATE `menudb`.`ingredients` SET `price`='"+jTextFieldCost.getText()+"' WHERE `name`='"+jListName.getSelectedValue()+"'");
             populateList();
             } catch (SQLException ex)
             {
                 Logger.getLogger(inventory.class.getName()).log(Level.SEVERE,null,ex);
             }     
     }//GEN-LAST:event_jButtonEditActionPerformed
-
-    private void jTextFieldCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCostActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextFieldCostActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Chef chef=new Chef();
@@ -281,7 +305,7 @@ public class inventory extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jListName;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextFieldCost;
-    private javax.swing.JTextField jTextFieldQuantity;
+    private javax.swing.JFormattedTextField jTextFieldCost;
+    private javax.swing.JFormattedTextField jTextFieldQuantity;
     // End of variables declaration//GEN-END:variables
 }
