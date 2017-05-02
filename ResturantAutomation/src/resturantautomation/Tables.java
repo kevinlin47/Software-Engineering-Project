@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Author:
+Kevin Lin
  */
 package resturantautomation;
 
@@ -26,6 +25,7 @@ public class Tables extends javax.swing.JFrame {
     /**
      * Creates new form Tables
      */
+    //Status string variable for each table
     String statusTableOne="";
     String statusTableTwo="";
     String statusTableThree="";
@@ -33,6 +33,7 @@ public class Tables extends javax.swing.JFrame {
     String statusTableFive="";
     String statusTableSix="";
     
+    //Create timer for table updates
     Timer timer=new Timer();
     TimerTask task=new TimerTask()
     {
@@ -46,7 +47,7 @@ public class Tables extends javax.swing.JFrame {
     
     public Tables() {
         initComponents();
-        timer.scheduleAtFixedRate(task, 1000, 15000);
+        timer.scheduleAtFixedRate(task, 1000, 15000); //check table updates every 15 seconds
     }
 
     /**

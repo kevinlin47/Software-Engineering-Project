@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Author:
+Kevin Lin
  */
 package resturantautomation;
 import java.awt.Graphics2D;
@@ -240,12 +239,14 @@ public class orderMenu extends javax.swing.JFrame {
         
         
         try
-        {
+        {   
+            //Connect to MySQL Menu table
             Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/menudb","root","password");
       
             Statement st =conn.createStatement();
             ResultSet rs= st.executeQuery("select * from menu");
             
+            //populate appetizer list
             while (rs.next())
             {
                 if ("appetizer".equals(rs.getString(4)))
@@ -253,6 +254,8 @@ public class orderMenu extends javax.swing.JFrame {
                     dlm.addElement(rs.getString(1));
                 }
             }
+            
+            //populate entree list
             rs= st.executeQuery("select * from menu");
             while (rs.next())
             {
@@ -261,6 +264,8 @@ public class orderMenu extends javax.swing.JFrame {
                     dlm2.addElement(rs.getString(1));
                 }
             }
+            
+            //populate drink list
             rs= st.executeQuery("select * from menu");
             while(rs.next())
             {
@@ -269,6 +274,8 @@ public class orderMenu extends javax.swing.JFrame {
                     dlm3.addElement(rs.getString(1));
                 }
             }
+            
+            //populate dessert list
             rs= st.executeQuery("select * from menu");
             while(rs.next())
             {
@@ -290,6 +297,7 @@ public class orderMenu extends javax.swing.JFrame {
             DefaultListModel dlm=new DefaultListModel();
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
            
+            //check to see what items have been selected and add to the order list
            if(appetizersList.isSelectionEmpty()==false)
            {    
                int[] indexes=appetizersList.getSelectedIndices();
@@ -394,7 +402,7 @@ public class orderMenu extends javax.swing.JFrame {
 
                 
             }
-            /*System.out.print(completeOrder);*/
+            // Connect to server and send the order
             Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
             PS.println(completeOrder);

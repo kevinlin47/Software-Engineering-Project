@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Author:
+Kevin Lin
  */
 package resturantautomation;
 
@@ -21,7 +20,8 @@ import javax.swing.JOptionPane;
  * @author Kevin Lin
  */
 public class Waiter extends javax.swing.JFrame {
-
+    
+    //timer to check for updates on submitted orders
     Timer timer=new Timer();
     TimerTask task=new TimerTask()
     {
@@ -112,6 +112,7 @@ public class Waiter extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
+    //function to go to table status menu
     private void displayTables()
     {
         this.setVisible(false);
@@ -119,10 +120,12 @@ public class Waiter extends javax.swing.JFrame {
         tables.setVisible(true);
     }
     
+    //view table button code
     private void viewTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewTableActionPerformed
         displayTables();
     }//GEN-LAST:event_viewTableActionPerformed
-
+    
+    //new order button code
     private void newOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newOrderActionPerformed
         orderMenu menuPage=new orderMenu();
         menuPage.setVisible(true);
@@ -142,7 +145,8 @@ public class Waiter extends javax.swing.JFrame {
     }//GEN-LAST:event_clockButtonActionPerformed
     
     private void checkUpdates() 
-    {
+    {   
+        //connect to server
         try {
             Socket sock=new Socket("192.168.43.56",1995);
             PrintStream PS=new PrintStream(sock.getOutputStream());
@@ -154,6 +158,8 @@ public class Waiter extends javax.swing.JFrame {
             String message=BR.readLine();
             System.out.println(message);
             
+            //if string received from server is "orderComplete"
+            //let waiter know an order is complete
             if (message.equals("orderComplete"))
             {
                 JOptionPane.showMessageDialog(null,"An order has been completed");

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Author:
+Kevin Lin
  */
 package resturantautomation;
 
@@ -103,18 +102,24 @@ public class Login extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //Code for exit button
     private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
         super.dispose();
     }//GEN-LAST:event_exitButtonActionPerformed
-
+    
+    //Code for login button
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
     try{
         int flag = 1;
+        
+        //Connect to MySQL Login Table
         Connection conn=DriverManager.getConnection("jdbc:mysql://resturantdb.cul7akmhbeku.us-west-2.rds.amazonaws.com:3306/logindb","root","password");
       
         Statement st =conn.createStatement();
         ResultSet rs= st.executeQuery("select * from usertable");
+        
+        //Search for matching login information from table
         while(rs.next())
         {
             if (rs.getString(2).equals(jTextField1.getText()) && rs.getString(3).equals(jPasswordField1.getText()))
@@ -124,6 +129,7 @@ public class Login extends javax.swing.JFrame {
             }
         }
         
+        //See what type of user logged in
         if (flag==0)
         {
             if ("manager".equals(rs.getString(2)))
@@ -149,7 +155,7 @@ public class Login extends javax.swing.JFrame {
 
          }
         
-        
+        //if no match found, let user knnow
         else
         {
             JOptionPane.showMessageDialog(null,"Invalid username and password");

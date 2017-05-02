@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Author:
+Kevin Lin
  */
 package resturantautomation;
 
@@ -23,7 +22,7 @@ public class Customer extends javax.swing.JFrame {
      */
     public Customer() {
         initComponents();
-        displayPicture();
+        displayPicture(); //function to display resturant logo
     }
 
     /**
@@ -79,7 +78,8 @@ public class Customer extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //Button Code for survey
     private void surveyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_surveyButtonActionPerformed
         this.setVisible(false);
         surveyPage survey=new surveyPage();
