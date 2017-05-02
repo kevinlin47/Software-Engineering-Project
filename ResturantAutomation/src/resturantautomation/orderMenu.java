@@ -403,7 +403,7 @@ public class orderMenu extends javax.swing.JFrame {
                 
             }
             // Connect to server and send the order
-            Socket sock=new Socket("192.168.43.56",1995);
+            Socket sock=new Socket("192.168.43.56",1995); //Host machine IP
             PrintStream PS=new PrintStream(sock.getOutputStream());
             PS.println(completeOrder);
             

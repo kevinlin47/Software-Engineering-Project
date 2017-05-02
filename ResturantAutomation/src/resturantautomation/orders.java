@@ -184,7 +184,7 @@ public class orders extends javax.swing.JFrame {
         /*ArrayList<String>orderList=new ArrayList<String>();*/
         orderList.clear();
         try {
-            Socket sock=new Socket("192.168.43.56",1995);
+            Socket sock=new Socket("192.168.43.56",1995); //host machine IP
             PrintStream PS=new PrintStream(sock.getOutputStream());
             PS.println("chef");
             
