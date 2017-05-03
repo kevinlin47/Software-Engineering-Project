@@ -123,3 +123,13 @@ and let the user know the update went through or not. Changes will be shown with
 Clock in/out button , brings the waiter to the clocking in and clocking out window.
 
 The back button brings the user back to the login screen.
+
+5. Customer login
+For username=customer, password=customer
+
+There are two buttons on the customer page and a logo (this would be changed to the resturant logo).
+The take survey button brings the user to a page that asks three questions one related to food, time, and service. 
+Additional comments may be added in the additional comments box in the bottom. Once completed the user clicks submit, and a dialog
+box will thank them for taking the survey and bring them back to the original customer menu. The create order button currently does
+not provide any action. Also there is no back button for this page because I did not want the customer to have the ability to exit out
+of that screen.
